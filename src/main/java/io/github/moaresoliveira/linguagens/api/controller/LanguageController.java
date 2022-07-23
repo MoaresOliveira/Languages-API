@@ -20,11 +20,16 @@ public class LanguageController {
 
     @GetMapping
     public ResponseEntity<List<Language>> getAllLanguages(){
-        Sort sort = Sort.sort(Language.class).by("ranking").ascending();
+        Sort sort = Sort.sort(Language.class).by("votes").descending();
         List<Language> languages = repository.findAll(sort);
         if(languages.isEmpty()){
             return ResponseEntity.noContent().build();
         }
+        languages.stream().forEach(language -> {
+            int ranking = languages.indexOf(language);
+            language.setRanking(ranking+1);
+        });
+        repository.saveAll(languages);
         return ResponseEntity.ok(languages);
     }
 
@@ -36,6 +41,10 @@ public class LanguageController {
 
     @PostMapping("/add")
     public ResponseEntity<Language> addLanguage(@RequestBody LanguageDTO language){
+        Language languageFound = repository.findLanguagesByNameEqualsIgnoreCase(language.getName());
+        if(languageFound != null){
+            return ResponseEntity.badRequest().build();
+        }
         Language languageSaved = repository.save(language.toEntity());
         return ResponseEntity.status(HttpStatus.CREATED).body(languageSaved);
     }
@@ -43,9 +52,7 @@ public class LanguageController {
     @PutMapping("/{name}")
     public ResponseEntity<Language> updateLanguage(@PathVariable("name") String name,@RequestBody LanguageDTO language){
         Language languageFound = repository.findLanguagesByNameEqualsIgnoreCase(name);
-        languageFound.setName(language.getName());
-        languageFound.setLogo(language.getLogo());
-        languageFound.setRanking(language.getRanking());
+        languageFound.update(language);
         Language languageUpdated = repository.save(languageFound);
         return ResponseEntity.ok(languageUpdated);
     }

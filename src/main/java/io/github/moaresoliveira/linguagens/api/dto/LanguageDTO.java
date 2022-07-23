@@ -10,12 +10,13 @@ public class LanguageDTO {
     private String name;
     private String logo;
     private Integer ranking;
+    private Integer votes;
 
     public Language toEntity(){
         return Language.builder()
                         .name(name)
                         .logo(logo)
-                        .ranking(ranking)
+                        .ranking(Integer.MAX_VALUE)
                         .votes(0)
                         .build();
     }

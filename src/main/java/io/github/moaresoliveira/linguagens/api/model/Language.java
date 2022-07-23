@@ -1,5 +1,6 @@
 package io.github.moaresoliveira.linguagens.api.model;
 
+import io.github.moaresoliveira.linguagens.api.dto.LanguageDTO;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -16,5 +17,10 @@ public class Language {
     private String logo;
     private Integer ranking;
     private Integer votes;
+
+    public void update(LanguageDTO dto){
+        this.name = dto.getName();
+        this.logo = dto.getLogo();
+    }
 
 }
